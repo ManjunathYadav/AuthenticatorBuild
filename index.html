@@ -117,7 +117,21 @@
     </script>
       <script>
         function OpenNewWindow(url) {
-            window.open(url, '_blank');
+            // window.open(url, '_blank');
+        }
+
+        function CheckStoredToken() {
+          var token = localStorage.getItem('sessionToken');
+          var timestamp = localStorage.getItem('sessionTimestamp');
+          if (token && timestamp) {
+            var oneWeek = 7 * 24 * 60 * 60 * 1000;
+            if (Date.now() - new Date(timestamp).getTime() < oneWeek) {
+              SendMessage('UIManager', 'ValidateToken', token);
+            } else {
+              localStorage.removeItem('sessionToken');
+              localStorage.removeItem('sessionTimestamp');
+            }
+          }
         }
       </script>
   </body>
