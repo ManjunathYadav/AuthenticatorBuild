@@ -105,6 +105,7 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
+          gameInstance = unityInstance;
           loadingBar.style.display = "none";
           fullscreenButton.onclick = () => {
             unityInstance.SetFullscreen(1);
@@ -115,24 +116,35 @@
       };
       document.body.appendChild(script);
     </script>
-      <script>
-        function OpenNewWindow(url) {
-            window.open(url, '_blank');
+    <script>
+      function openNewWindow(url) {
+      console.log('Web page opened');
+      window.open(url, '_blank');
+      }
+    
+      function storeToken(token) {
+      localStorage.setItem('sessionToken', token);
+      localStorage.setItem('sessionTimestamp', Date.now().toString());
+      console.log('Token:', token);
+      console.log('Timestamp:', Date.now().toString());
+      }
+    
+      function checkStoredToken() {
+      var token = localStorage.getItem('sessionToken');
+      var timestamp = localStorage.getItem('sessionTimestamp');
+      console.log('Retrieved Token:', token);
+      console.log('Retrieved Timestamp:', timestamp);
+      if (token && timestamp) {
+        var oneWeek = 7 * 24 * 60 * 60 * 1000;
+        if (Date.now() - parseInt(timestamp) < oneWeek) {
+          gameInstance.SendMessage('UIManager', 'ValidateToken', token);
+        } else {
+        console.log('Token expired');
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('sessionTimestamp');
         }
-
-        function CheckStoredToken() {
-          var token = localStorage.getItem('sessionToken');
-          var timestamp = localStorage.getItem('sessionTimestamp');
-          if (token && timestamp) {
-            var oneWeek = 7 * 24 * 60 * 60 * 1000;
-            if (Date.now() - new Date(timestamp).getTime() < oneWeek) {
-              SendMessage('UIManager', 'ValidateToken', token);
-            } else {
-              localStorage.removeItem('sessionToken');
-              localStorage.removeItem('sessionTimestamp');
-            }
-          }
-        }
-      </script>
+      }
+      }
+    </script>
   </body>
 </html>
